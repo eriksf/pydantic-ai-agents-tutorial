@@ -6,7 +6,7 @@ A step-by-step guide to building intelligent AI agents using Pydantic AI and loc
 
 ## 🌟 Features
 
-- 📝 Structured output with Pydantic models
+- 📝 Structured output
 - 🔧 Custom tool integration
 - 👁️ Using Vision models (llama3.2 vision / minicpm-v)
 - 🤝 Simple Multi-agent systems
