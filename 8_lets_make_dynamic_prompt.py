@@ -40,7 +40,7 @@ def add_user_command() -> str:
 # arg[0] is the application script itself
 # arg[1] is the input prompt 
 # exmaple: python3 8_lets_make_dynamic_prompt.py "calculate 1.11111*2.222222*3.33333/5.555555"
-# exmaple: python3 8_lets_make_dynamic_prompts.py "find local ip address using code"
+# exmaple: python3 8_lets_make_dynamic_prompt.py "find local ip address using code"
 if len(sys.argv) == 2:
     print(sys.argv[1])
 else:
