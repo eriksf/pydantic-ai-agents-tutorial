@@ -61,10 +61,10 @@ def get_file_contents_as_str(file_path: str) -> str:
 
 
 
-response = agent.run_sync("Analysis the .bin file in directory '/home/abdallah/dev/test1/pydantic/src/sample_data' and tell me what is this file")
+response = agent.run_sync("Analysis all files ends with 'bin' extention in directory './10_sample_data' and tell me what is those files")
 print(response.data)
 
 
-response = agent.run_sync("Do you find andy common data between all files in '/home/abdallah/dev/test1/pydantic/src/sample_data'")
+response = agent.run_sync("Do you find andy common data between all files in './10_sample_data'")
 print(response.data)
 
