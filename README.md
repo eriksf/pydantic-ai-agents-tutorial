@@ -73,7 +73,7 @@ based on offical documentation Qwen2.5 uses hermes tool calling and hermes jinja
 ```bash
 # Running Qwen2.5-32B with dual RTX cards. 
 
-vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \                                            (vllm)
+vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \                                 
            --tensor-parallel-size 2  \
            --enforce-eager \
            --kv-cache-dtype fp8 \
