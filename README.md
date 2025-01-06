@@ -47,6 +47,7 @@ If you prefer faster local inference you can use vLLM, here is 2 examples for pr
 ```bash
 # create vllm conda environment 
 conda create -n vllm python=3.12 pip -y
+conda activate vllm
 pip install vllm
 
 # run vllm with LLama3.1 8B with flags that enables tool calling
