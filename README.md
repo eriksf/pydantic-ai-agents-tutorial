@@ -38,6 +38,59 @@ ollama pull qwen2.5:32b
 ollama pull llama3.2-vision:latest
 ollama pull minicpm-v
 ```
+
+## (optional) setup vLLM for tool calling 
+
+If you prefer faster local inference you can use vLLM, here is 2 examples for preparing vLLM 
+
+### Running LLama3.1 
+```bash
+# create vllm conda environment 
+conda create -n vllm python=3.12 pip -y
+pip install vllm
+
+# run vllm with LLama3.1 8B with flags that enables tool calling
+# assuming you downloaded the GPTQ-Q8 version 
+
+vllm serve Meta-Llama-3.1-8B-Instruct-GPTQ-Q_8 \
+           --port 5003 \                                
+           --enforce-eager \
+           --kv-cache-dtype fp8 \
+           --enable-chunked-prefill  \
+           --enable-auto-tool-choice \
+           --tool-call-parser llama3_json \
+           --chat-template ./tool_chat_template_llama3.1_json.jinja
+``` 
+you can download the jinja template from vllm github repo
+[vLLM repo](https://github.com/vllm-project/vllm/)
+**vllm/examples/tool_chat_template_llama3.1_json.jinja**
+
+### Running Qwen2.5 
+based on offical documentation Qwen2.5 uses hermes tool calling and hermes jinja template 
+[Qwen2.5 function_call](https://qwen.readthedocs.io/en/latest/framework/function_call.html)
+
+```bash
+# Running Qwen2.5-32B with dual RTX cards. 
+
+vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \                                            (vllm)
+           --tensor-parallel-size 2  \
+           --enforce-eager \
+           --kv-cache-dtype fp8 \
+           --enable-chunked-prefill  \
+           --enable-auto-tool-choice \
+           --tool-call-parser hermes \
+           --chat-template ./tool_chat_template_hermes.jinja
+``` 
+Now all you need is to use OpenAPI model and change the base_url 
+
+```python
+model = OpenAIModel(
+    'Qwen2.5-32B-Instruct-AWQ',
+    base_url='http://localhost:5003/v1',
+    api_key='vllm',
+)
+```
+
 ## 📚 Tutorial Structure
 
 The repository contains progressive examples:
