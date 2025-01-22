@@ -47,6 +47,7 @@ If you prefer faster local inference you can use vLLM, here is 2 examples for pr
 ```bash
 # create vllm conda environment 
 conda create -n vllm python=3.12 pip -y
+conda activate vllm
 pip install vllm
 
 # run vllm with LLama3.1 8B with flags that enables tool calling
@@ -72,7 +73,7 @@ based on offical documentation Qwen2.5 uses hermes tool calling and hermes jinja
 ```bash
 # Running Qwen2.5-32B with dual RTX cards. 
 
-vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \                                            (vllm)
+vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \                                 
            --tensor-parallel-size 2  \
            --enforce-eager \
            --kv-cache-dtype fp8 \
