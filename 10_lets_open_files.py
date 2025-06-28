@@ -1,11 +1,24 @@
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext, Tool
-from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
-model = OllamaModel( model_name='Replete-LLM-V2.5-Qwen-32b-Q5_K_S')
+# Load environment variables from .env file
+load_dotenv()
 
+# Retrieve the variables from the environment
+model_name = os.getenv('MODEL_NAME')
+base_url = os.getenv('BASE_URL')
+api_key = os.getenv('API_KEY')
+
+# Create an instance of OpenAIModel using the loaded variables
+model = OpenAIModel(
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+)
 
 agent = Agent(
     model=model,
@@ -62,9 +75,9 @@ def get_file_contents_as_str(file_path: str) -> str:
 
 
 response = agent.run_sync("Analysis all files ends with 'bin' extention in directory './10_sample_data' and tell me what is those files")
-print(response.data)
+print(response.output)
 
 
 response = agent.run_sync("Do you find andy common data between all files in './10_sample_data'")
-print(response.data)
+print(response.output)
 

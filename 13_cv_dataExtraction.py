@@ -1,15 +1,28 @@
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext, Tool
-from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from dotenv import load_dotenv
+import os
+import mlflow
 from markitdown import MarkItDown
 import pymupdf4llm
 
-# use vLLM or tabbyAPI for faster inference
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the variables from the environment
+model_name = os.getenv('MODEL_NAME')
+base_url = os.getenv('BASE_URL')
+api_key = os.getenv('API_KEY')
+
+# Create an instance of OpenAIModel using the loaded variables
 model = OpenAIModel(
-    'Qwen2.5-32B-Instruct-AWQ',
-    base_url='http://localhost:5003/v1',
-    api_key='tabbyAPI',
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
 )
 
 def extract_pdf_to_markdown(pdf_path):
@@ -66,13 +79,17 @@ class employeeModel(BaseModel):
 
 agent = Agent(
     model=model,
-    result_type=employeeModel,
+    output_type=employeeModel,
     system_prompt=(
-        "You are an intelligent resume & CV analysis agent "
+        "You are an intelligent resume & CV analysis agent. Extract all needed information, Be consice"
         "Analyze CV data and extract all keypoints such as working history, skill list"
-        "extract highlights about strength point for CV applicant"
+        "DON'T SUMMARIZE ANY CONTENT, WRITE DATA IN JSON ENTRY AS IN ORIGINAL CONTENT"
+        "DON'T FAKE ANY DATA, IF YOU CAN'T FIND SOME DATA, WRITE _NONE_"
+        # "You are an intelligent and accurate resume & CV analysis agent. Extract all needed information"
+        # "IF YOU CAN'T FIND the field/entry DATA, WRITE _NONE_ or 0"
+        # "always use context provided only, Don't write any information not included in the context"
     ),
-    result_retries = 3
+    max_result_retries=3
 )
 
 
@@ -82,6 +99,6 @@ cv_markdown = extract_pdf_to_markdown('resources/abdallah.pdf')
 
 response = agent.run_sync(f"extract all information from attached CV data {cv_markdown}")
 
-print(response.data.model_dump_json(indent=2))
+print(response.output.model_dump_json(indent=2))
 print("-------------------usage ----------------------\n\n")
 print(response.usage())

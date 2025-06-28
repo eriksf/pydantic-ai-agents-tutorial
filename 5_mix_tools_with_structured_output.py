@@ -1,11 +1,24 @@
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext, Tool
-from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
 import subprocess
+from dotenv import load_dotenv
+import os
 
-model = OllamaModel( model_name='Replete-LLM-V2.5-Qwen-32b-Q5_K_S')
+# Load environment variables from .env file
+load_dotenv()
 
+# Retrieve the variables from the environment
+model_name = os.getenv('MODEL_NAME')
+base_url = os.getenv('BASE_URL')
+api_key = os.getenv('API_KEY')
+
+# Create an instance of OpenAIModel using the loaded variables
+model = OpenAIModel(
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+)
 
 class ResponseModel(BaseModel):
     """Automatic Structured response with metadata."""
@@ -32,24 +45,20 @@ def get_current_ip_address() -> str:
     """Get public IP address using ifconfig.me website"""
     command = ['curl','ifconfig.me']
     result = subprocess.run(command, capture_output=True, text=True)
-    #print(result.stdout)
+    print(result.stdout)
     return result.stdout
     
 @agent.tool_plain
-def get_ip_info_with_whois(ip_to_track) -> str:
-    """Get information about the IP address using Whoio"""
+def get_ip_info_with_whois(ip_to_track:str) -> str:
+    """Get information about the IP address using Whois"""
     command = ['whois', ip_to_track]
     result = subprocess.run(command, capture_output=True, text=True)
-    #print(result.stdout)
+    print(result.stdout)
     return result.stdout
 
 
 data_list = []
 
 response = agent.run_sync("can you guess where I am now?")
-print(response.data.model_dump_json(indent=2))
-
-# Uncomment to debug :)
-print("--------------Debug----------------\n\n\n")
-print(str(response.usage()))
-# print(response.all_messages())
+print(response.output.model_dump_json(indent=1))
+print(response.usage())

@@ -4,6 +4,15 @@ Learn Pydantic AI agents, step by step,
 
 A step-by-step guide to building intelligent AI agents using Pydantic AI and local models and (Ollama or any OAI compatible). This tutorial demonstrates how to create structured, vision-capable, and tool-equipped AI agents.
 
+## ✅ **Updated for Latest Pydantic-AI APIs**
+
+**All examples have been updated to use the latest Pydantic-AI library APIs**, including:
+- Modern `OpenAIModel` with `OpenAIProvider` structure
+- Updated parameter names (`output_type`, `max_result_retries`)
+- Latest multimodal/vision processing with `BinaryContent`
+- Fixed deprecated API usage (`response.output` instead of `response.data`)
+- Environment variable configuration for dynamic model setup
+
 ## 🌟 Features
 
 - 📝 Structured output
@@ -27,7 +36,17 @@ conda create -n pydantic python=3.12 pip -y
 ```bash
 pip install pydantic-ai llm-sandbox
 ```
-4. Set up Ollama and required models (chosee any of those model)
+
+4. Configure your environment:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env and uncomment/configure your preferred LLM provider
+# The file includes examples for OpenAI, Ollama, vLLM, DeepSeek, and more
+```
+
+5. Set up Ollama and required models (choose any of those model)
 ```bash
 # Best agents model for local run
 ollama pull llama3.1:8b-instruct-q8_0
@@ -60,6 +79,7 @@ vllm serve Meta-Llama-3.1-8B-Instruct-GPTQ-Q_8 \
            --enable-chunked-prefill  \
            --enable-auto-tool-choice \
            --tool-call-parser llama3_json \
+           --guided-decoding-backend xgrammar \
            --chat-template ./tool_chat_template_llama3.1_json.jinja
 ``` 
 you can download the jinja template from vllm github repo
@@ -80,17 +100,40 @@ vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \
            --enable-chunked-prefill  \
            --enable-auto-tool-choice \
            --tool-call-parser hermes \
+           --guided-decoding-backend xgrammar \
            --chat-template ./tool_chat_template_hermes.jinja
 ``` 
-Now all you need is to use OpenAPI model and change the base_url 
 
-```python
-model = OpenAIModel(
-    'Qwen2.5-32B-Instruct-AWQ',
-    base_url='http://localhost:5003/v1',
-    api_key='vllm',
-)
+```bash
+# Running Qwen3-30B-A3B-GPTQ-Int4 with dual RTX cards. 
+
+vllm serve Qwen3-30B-A3B-GPTQ-Int4 \
+        --disable-log-requests \
+        --port 5003\
+        --tensor-parallel-size 2 \
+        --enable-prefix-caching \
+        --enable-auto-tool-choice \
+        --tool-call-parser hermes \
+        --enable-reasoning \
+        --reasoning-parser deepseek_r1  \
+        --guided-decoding-backend xgrammar \
+        --kv-cache-dtype fp8
+``` 
+
+### Configuring .env for vLLM
+
+After starting your vLLM server, update your `.env` file to use it. For example, if you're running Qwen2.5-32B-Instruct-AWQ:
+
+```bash
+# Edit your .env file
+MODEL_NAME=Qwen2.5-32B-Instruct-AWQ
+BASE_URL=http://localhost:5003/v1
+API_KEY=vllm
 ```
+
+The examples will automatically use your vLLM server configuration. No code changes needed!
+
+
 
 ## 📚 Tutorial Structure
 

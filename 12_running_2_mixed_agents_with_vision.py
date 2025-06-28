@@ -1,42 +1,33 @@
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, ModelRetry, RunContext, Tool
-from pydantic_ai.models.ollama import OllamaModel
+from pydantic_ai import Agent, BinaryContent
 from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
 from pathlib import Path
-
-#import os and base64 to open images and send them as string encoded in base64
 import os
-import base64
+
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the variables from the environment
+model_name = os.getenv('MODEL_NAME')
+base_url = os.getenv('BASE_URL')
+api_key = os.getenv('API_KEY')
+
+# Create an instance of OpenAIModel using the loaded variables
+vision_model = OpenAIModel(
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+)
+
+analysis_model = OpenAIModel(
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+)
 
 # Note for ollama both "minicpm-v" and "llama3.2-vision:latest" can't be used with pydantic tool calling, so we can't use it directly to call functions and format text
 # therefor I will use 2 models, one for OCR and one for make structured data
-
-# vision_model = OllamaModel( model_name='minicpm-v')
-vision_model = OllamaModel( model_name='llama3.2-vision')
-analysis_model = OllamaModel( model_name='Replete-LLM-V2.5-Qwen-32b-Q5_K_S')
-
-
-class ImageLoaderBase64:
-    message_with_image = []
-
-    def __init__(self, user_request:str, image_file_path: str):
-        with open(image_file_path, "rb") as image_file:
-            base64_image = base64.b64encode(image_file.read()).decode("utf-8")
-        
-            prepare_image_inside_message = [
-                    {
-                        "type": "text",
-                        "text": f"{user_request}"
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/png;base64,{base64_image}",
-                            "detail": "high"
-                        }
-                    }
-                ]
-            self.encoded_message_with_image = prepare_image_inside_message
 
 
 class Item(BaseModel):
@@ -65,17 +56,20 @@ agent_analysis = Agent(
     system_prompt = "You are smart analysis agent, take the extracted OCR data, extract items and convert it to structured report",
 )
 
-image_request = ImageLoaderBase64(
-    # user_request="list down in entries, start the entry with item name then create bullet points for quantity, price per item. add another entry for sub-total, tax value, total",
-    user_request="for the following receipt, do step by step extract all text and describe it in details",
-    image_file_path="./11_vision_sample_data/grocery_test.png"
-    )
+# Process the receipt image
+image_path = Path("./11_vision_sample_data/grocery_test.png")
+if image_path.exists():
+    image_data = image_path.read_bytes()
+    
+    print("--------Running first Agent for OCR ---------")
+    result_ocr_text = agent_vision.run_sync([
+        "for the following receipt, do step by step extract all text and describe it in details",
+        BinaryContent(data=image_data, media_type='image/png')
+    ])
+    print(result_ocr_text.output)
 
-print("--------Running first Agent for OCR ---------")
-result_ocr_text = agent_vision.run_sync(image_request.encoded_message_with_image)
-print(result_ocr_text.data)
-
-
-print("--------Running second Agent for summarizing the extracted data ---------")
-result_structured = agent_analysis.run_sync(result_ocr_text.data)
-print(result_structured.data.model_dump_json(indent=2))
+    print("\n--------Running second Agent for summarizing the extracted data ---------")
+    result_structured = agent_analysis.run_sync(result_ocr_text.output)
+    print(result_structured.output.model_dump_json(indent=2))
+else:
+    print("Error: grocery_test.png not found")

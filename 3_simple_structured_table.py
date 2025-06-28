@@ -1,14 +1,24 @@
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext, Tool
-from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from dotenv import load_dotenv
+import os
 
-# example using tabbyAPI with exl2 models
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the variables from the environment
+model_name = os.getenv('MODEL_NAME')
+base_url = os.getenv('BASE_URL')
+api_key = os.getenv('API_KEY')
+
+# Create an instance of OpenAIModel using the loaded variables
 model = OpenAIModel(
-    'llama3.1:8b-instruct-q8_0',
-    base_url='http://localhost:11434/v1',
-    api_key='tabbyAPI',
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
 )
+
 
 class ResponseModel(BaseModel):
     """Automatic Structured response with metadata."""
@@ -17,7 +27,7 @@ class ResponseModel(BaseModel):
     capital_name: str
     has_river: bool
     has_sea: bool
-    weather: str = Field(description="Weather over the year")
+    weather: str = Field(description="Weather over the year in 10 words only")
 
 
 agent = Agent(
@@ -43,16 +53,17 @@ agent2 = Agent(
 data_list = []
 
 response = agent.run_sync("tell me about Egypt")
-data_list.append(response.data.model_dump_json(indent=2))
+data_list.append(response.output.model_dump_json(indent=2))
 
 response = agent.run_sync("tell me about France")
-data_list.append(response.data.model_dump_json(indent=2))
+data_list.append(response.output.model_dump_json(indent=2))
 
 response = agent.run_sync("tell me about China")
-data_list.append(response.data.model_dump_json(indent=2))
+data_list.append(response.output.model_dump_json(indent=2))
 
 response = agent.run_sync("tell me about Australia")
-data_list.append(response.data.model_dump_json(indent=2))
+data_list.append(response.output.model_dump_json(indent=2))
 
 response_MDtable = agent2.run_sync(str(data_list))
-print(response_MDtable.data)
+print(response_MDtable.output)
+print(response_MDtable.usage())

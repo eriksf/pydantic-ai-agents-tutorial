@@ -1,9 +1,12 @@
-# run throught the terminal with one of bellow exmaples 
+# run throught the terminal with one of bellow exmaples
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelRetry, RunContext, Tool
-from pydantic_ai.models.ollama import OllamaModel
+# from pydantic_ai.models.ollama import OllamaModel  # Not available in this version
 from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from dotenv import load_dotenv
+import os
 
 # import safe sandbox
 from typing import Optional, List
@@ -12,8 +15,19 @@ from llm_sandbox import SandboxSession
 # lets get the input args
 import sys
 
-model = OllamaModel( model_name='Replete-LLM-V2.5-Qwen-32b-Q5_K_S')
+# Load environment variables from .env file
+load_dotenv()
 
+# Retrieve the variables from the environment
+model_name = os.getenv('MODEL_NAME')
+base_url = os.getenv('BASE_URL')
+api_key = os.getenv('API_KEY')
+
+# Create an instance of OpenAIModel using the loaded variables
+model = OpenAIModel(
+    model_name,
+    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+)
 # Lets mix 3 prompts, 1st one in the agents constructor
 # 2nd prompt will be added through add_1st_command_to_the_prompt()
 # 3rd prompt will be added through add_2nd_command_to_the_prompt()
@@ -48,6 +62,6 @@ else:
 
 
 response = agent.run_sync("You are an intelligent assistant.")
-print(response.data)
+print(response.output)
 
 
