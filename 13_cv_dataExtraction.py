@@ -85,9 +85,6 @@ agent = Agent(
         "Analyze CV data and extract all keypoints such as working history, skill list"
         "DON'T SUMMARIZE ANY CONTENT, WRITE DATA IN JSON ENTRY AS IN ORIGINAL CONTENT"
         "DON'T FAKE ANY DATA, IF YOU CAN'T FIND SOME DATA, WRITE _NONE_"
-        # "You are an intelligent and accurate resume & CV analysis agent. Extract all needed information"
-        # "IF YOU CAN'T FIND the field/entry DATA, WRITE _NONE_ or 0"
-        # "always use context provided only, Don't write any information not included in the context"
     ),
     max_result_retries=3
 )
@@ -95,7 +92,7 @@ agent = Agent(
 
 
 # load CV with pyMuPDF
-cv_markdown = extract_pdf_to_markdown('resources/abdallah.pdf')
+cv_markdown = extract_pdf_to_markdown('resources/cv_sample.pdf')
 
 response = agent.run_sync(f"extract all information from attached CV data {cv_markdown}")
 
