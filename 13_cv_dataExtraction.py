@@ -92,7 +92,7 @@ agent = Agent(
 
 
 # load CV with pyMuPDF
-cv_markdown = extract_pdf_to_markdown('resources/cv_sample.pdf')
+cv_markdown = extract_pdf_to_markdown('resources/CV_TEMPLATE_0002.pdf')
 
 response = agent.run_sync(f"extract all information from attached CV data {cv_markdown}")
 
