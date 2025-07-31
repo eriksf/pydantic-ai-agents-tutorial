@@ -29,12 +29,12 @@ A step-by-step guide to building intelligent AI agents using Pydantic AI and loc
 
 ```bash
 conda create -n pydantic python=3.12 pip -y
-``` 
+```
 
 3. Install dependencies:
 
 ```bash
-pip install pydantic-ai llm-sandbox
+pip install -r requirements.txt
 ```
 
 4. Configure your environment:
@@ -58,22 +58,22 @@ ollama pull llama3.2-vision:latest
 ollama pull minicpm-v
 ```
 
-## (optional) setup vLLM for tool calling 
+## (optional) setup vLLM for tool calling
 
-If you prefer faster local inference you can use vLLM, here is 2 examples for preparing vLLM 
+If you prefer faster local inference you can use vLLM, here is 2 examples for preparing vLLM
 
-### Running LLama3.1 
+### Running LLama3.1
 ```bash
-# create vllm conda environment 
+# create vllm conda environment
 conda create -n vllm python=3.12 pip -y
 conda activate vllm
 pip install vllm
 
 # run vllm with LLama3.1 8B with flags that enables tool calling
-# assuming you downloaded the GPTQ-Q8 version 
+# assuming you downloaded the GPTQ-Q8 version
 
 vllm serve Meta-Llama-3.1-8B-Instruct-GPTQ-Q_8 \
-           --port 5003 \                                
+           --port 5003 \
            --enforce-eager \
            --kv-cache-dtype fp8 \
            --enable-chunked-prefill  \
@@ -81,19 +81,19 @@ vllm serve Meta-Llama-3.1-8B-Instruct-GPTQ-Q_8 \
            --tool-call-parser llama3_json \
            --guided-decoding-backend xgrammar \
            --chat-template ./tool_chat_template_llama3.1_json.jinja
-``` 
+```
 you can download the jinja template from vllm github repo
 [vLLM repo](https://github.com/vllm-project/vllm/)
 **vllm/examples/tool_chat_template_llama3.1_json.jinja**
 
-### Running Qwen2.5 
-based on offical documentation Qwen2.5 uses hermes tool calling and hermes jinja template 
+### Running Qwen2.5
+based on offical documentation Qwen2.5 uses hermes tool calling and hermes jinja template
 [Qwen2.5 function_call](https://qwen.readthedocs.io/en/latest/framework/function_call.html)
 
 ```bash
-# Running Qwen2.5-32B with dual RTX cards. 
+# Running Qwen2.5-32B with dual RTX cards.
 
-vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \                                 
+vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \
            --tensor-parallel-size 2  \
            --enforce-eager \
            --kv-cache-dtype fp8 \
@@ -102,10 +102,10 @@ vllm serve Qwen2.5-32B-Instruct-AWQ --port 5003 \
            --tool-call-parser hermes \
            --guided-decoding-backend xgrammar \
            --chat-template ./tool_chat_template_hermes.jinja
-``` 
+```
 
 ```bash
-# Running Qwen3-30B-A3B-GPTQ-Int4 with dual RTX cards. 
+# Running Qwen3-30B-A3B-GPTQ-Int4 with dual RTX cards.
 
 vllm serve Qwen3-30B-A3B-GPTQ-Int4 \
         --disable-log-requests \
@@ -118,7 +118,7 @@ vllm serve Qwen3-30B-A3B-GPTQ-Int4 \
         --reasoning-parser deepseek_r1  \
         --guided-decoding-backend xgrammar \
         --kv-cache-dtype fp8
-``` 
+```
 
 ### Configuring .env for vLLM
 

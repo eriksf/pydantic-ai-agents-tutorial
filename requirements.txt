@@ -1,0 +1,5 @@
+pydantic-ai[logfire]
+llm-sandbox
+smolagents
+mlflow
+logfire
