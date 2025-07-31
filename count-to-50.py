@@ -13,7 +13,7 @@ model_name = os.getenv('MODEL_NAME')
 base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
-# Create an instance of OpenAIModel using the loaded variables
+# Create an instance of an OpenAIModel using the loaded variables
 model = OpenAIModel(
     model_name,
     provider=OpenAIProvider(base_url=base_url, api_key=api_key),

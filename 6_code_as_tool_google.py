@@ -5,8 +5,8 @@ import os
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 from smolagents import PythonInterpreterTool
 
 # Load environment variables from .env file
@@ -18,9 +18,9 @@ base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
 # Create an instance of OpenAIModel using the loaded variables
-model = OpenAIModel(
+model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
 
 python_interpreter = PythonInterpreterTool(authorized_imports=["odf", "pathlib", "datetime"])
@@ -29,8 +29,9 @@ agent = Agent(
     model=model,
     system_prompt=(
         "You are an intelligent research agent. "
-        "Analyze user request carefully and provide structured responses"
-        "you have access to multiple tools, use suitble tools to fullfil user request"
+        "Analyze the user request carefully and provide structured responses "
+        "using suitable tools to fullfill the request. "
+        "You have access to multiple tools."
     ),
     output_retries=3
 )

@@ -1,13 +1,16 @@
+import os
+
+import mlflow
+import mlflow.openai
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, ModelRetry, RunContext, Tool
+from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
-from dotenv import load_dotenv
-import os
-# import mlflow
 
-# mlflow.set_tracking_uri(uri="http://localhost:8775")
-# mlflow.litellm.autolog()
+mlflow.set_tracking_uri(uri="http://localhost:8775")
+mlflow.set_experiment("Ollama")
+mlflow.openai.autolog()
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,7 +28,6 @@ model = OpenAIModel(
 
 
 class ResponseModel(BaseModel):
-    """Automatic Structured response with """
     continent_name: str
     country_name: str
     capital_name: str
@@ -36,13 +38,13 @@ class ResponseModel(BaseModel):
 
 agent = Agent(
     model=model,
-    result_type=ResponseModel,
-    system_prompt=(
-        "You are an intelligent research agent. "
-        "Analyze user request carefully and provide structured responses."
-        "you must use function call"
-    ),
-        result_retries = 3,
+    output_type=ResponseModel,
+    #system_prompt=(
+    #    "You are an intelligent research agent. "
+    #    "Analyze user request carefully and provide structured responses. "
+    #    "You must use function call"
+    #),
+    output_retries=3,
 
 )
 
@@ -51,22 +53,22 @@ response = agent.run_sync("tell me about Egypt")
 print(response.output.model_dump_json(indent=1))
 print(response.usage())
 
-response = agent.run_sync("tell me about France")
-print(response.output.model_dump_json(indent=2))
-print(response.usage())
-
-response = agent.run_sync("tell me about China")
-print(response.output.model_dump_json(indent=3))
-print(response.usage())
-
-response = agent.run_sync("tell me about Australia")
-print(response.output.model_dump_json(indent=4))
-print(response.usage())
-
-response = agent.run_sync("tell me about Moroco")
-print(response.output.model_dump_json(indent=4))
-print(response.usage())
-
-response = agent.run_sync("tell me about Saudi Arabia")
-print(response.output.model_dump_json(indent=4))
-print(response.usage())
+#response = agent.run_sync("tell me about France")
+#print(response.output.model_dump_json(indent=2))
+#print(response.usage())
+#
+#response = agent.run_sync("tell me about China")
+#print(response.output.model_dump_json(indent=3))
+#print(response.usage())
+#
+#response = agent.run_sync("tell me about Australia")
+#print(response.output.model_dump_json(indent=4))
+#print(response.usage())
+#
+#response = agent.run_sync("tell me about Moroco")
+#print(response.output.model_dump_json(indent=4))
+#print(response.usage())
+#
+#response = agent.run_sync("tell me about Saudi Arabia")
+##print(response.output.model_dump_json(indent=4))
+#print(response.usage())

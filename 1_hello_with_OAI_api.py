@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field
-from pydantic_ai import Agent, ModelRetry, RunContext, Tool
+import os
+
+from dotenv import load_dotenv
+from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
-from dotenv import load_dotenv
-import os
 
 # Load environment variables from .env file
 load_dotenv()

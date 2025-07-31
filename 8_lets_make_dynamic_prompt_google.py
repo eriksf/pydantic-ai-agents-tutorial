@@ -2,12 +2,12 @@
 # pip install scipy==1.14.1
 
 import os
+import sys
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 from smolagents import PythonInterpreterTool
 
 # Load environment variables from .env file
@@ -19,31 +19,17 @@ base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
 # Create an instance of OpenAIModel using the loaded variables
-model = OpenAIModel(
+model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
-
-class FormatedTime(BaseModel):
-    year: str
-    month: str = Field(description="Write month with 3 letters only, example: Jan, Feb, Mar ...etc")
-    day_numeric: str = Field(description="Write day as numeric value")
-    day_name: str = Field(description="Write day as name, example: Sunday, Monday, Tuesday...etc")
-    time: str = Field(description="Write time in following format hours:minutes:PM/AM")
-    timezone: str = Field(description="timezone refrenced to GMT, exmaple GMT+1, GMT-2")
-    
 
 
 agent = Agent(
     model=model,
-    output_type=FormatedTime,
-    system_prompt=(
-        "You are an intelligent research agent. "
-        "Analyze the user request carefully and provide structured responses. "
-        "You have access to multiple tools, use suitable tools to fullfill the user request."
-    ),
-    output_retries=5
+    output_retries=3,
 )
+
 
 @agent.tool_plain
 def execute_python_code(code_string:str, libs:list[str] = ["odf", "pathlib", "datetime"]):
@@ -64,10 +50,22 @@ def execute_python_code(code_string:str, libs:list[str] = ["odf", "pathlib", "da
     except Exception as e:
         return f"Python code is wrong, send valid code, error code : {str(e)}"
 
+@agent.system_prompt
+def add_user_command() -> str:  
+    return sys.argv[1]
 
-# asking for timezone will make the llm try to install some libraries 
 
-request_msg = "Get the current date, time, day name and local timezone of your location."
-response = agent.run_sync(request_msg)
-print(response.output.model_dump_json(indent=1))
-print(response.usage())
+# Check if any additional arguments were passed
+# arg[0] is the application script itself
+# arg[1] is the input prompt 
+# exmaple: python3 8_lets_make_dynamic_prompt.py "calculate 1.11111*2.222222*3.33333/5.555555"
+# exmaple: python3 8_lets_make_dynamic_prompt.py "find local ip address using code"
+if len(sys.argv) == 2:
+    print(sys.argv[1])
+else:
+    print("No command provided. please run the script as \n python3 8_lets_make_dynamic_prompts.py \"command details - insert your prompt here\"")
+    exit(1)
+
+
+response = agent.run_sync("You are an intelligent assistant.")
+print(response.output)

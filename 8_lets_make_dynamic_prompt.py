@@ -1,14 +1,14 @@
 # NOTE: If you encounter scipy runtime errors, install this specific version:
 # pip install scipy==1.14.1
 
-from pydantic import BaseModel, Field
-from pydantic_ai import Agent, ModelRetry, RunContext, Tool
+import os
+import sys
+
+from dotenv import load_dotenv
+from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
-import sys
-from transformers.agents import PythonInterpreterTool
-from dotenv import load_dotenv
-import os
+from smolagents import PythonInterpreterTool
 
 # Load environment variables from .env file
 load_dotenv()
@@ -27,7 +27,7 @@ model = OpenAIModel(
 
 agent = Agent(
     model=model,
-    max_result_retries = 3,
+    output_retries=3,
 )
 
 

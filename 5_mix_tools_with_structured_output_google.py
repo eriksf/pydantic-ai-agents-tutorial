@@ -4,8 +4,8 @@ import subprocess
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,9 +16,9 @@ base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
 # Create an instance of OpenAIModel using the loaded variables
-model = OpenAIModel(
+model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
 
 class ResponseModel(BaseModel):
@@ -26,9 +26,9 @@ class ResponseModel(BaseModel):
     continent_location: str 
     country_location: str
     city_location: str
-    internet_provider: str = Field(description="what is the name of internet service provider")
-    ip_address_v4: str = Field(description="what is IP address (version 4) - IPv4")
-    ip_address_v6: str = Field(description="what is IP address (version 6) - IPv6")
+    internet_provider: str = Field(description="What is the name of internet service provider?")
+    ip_address_v4: str = Field(description="What is the IP address (version 4) - IPv4?")
+    ip_address_v6: str = Field(description="what is the IP address (version 6) - IPv6?")
 
 
 agent = Agent(
@@ -36,7 +36,7 @@ agent = Agent(
     output_type=ResponseModel,
     system_prompt=(
         "You are an intelligent research agent. "
-        "Analyze the user request carefully and provide structured responses using suitable tools to fullfill the user request"
+        "Analyze the user request carefully and provide structured responses using suitable tools to fullfill the user request."
     ),
     output_retries=5
 )
