@@ -3,8 +3,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent, BinaryContent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,9 +15,9 @@ base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
 # Create an instance of OpenAIModel using the loaded variables
-vision_model = OpenAIModel(
+vision_model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
 
 agent_vision = Agent(

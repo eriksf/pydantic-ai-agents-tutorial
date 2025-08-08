@@ -3,3 +3,5 @@ llm-sandbox
 smolagents
 mlflow
 logfire
+pymupdf4llm
+markitdown[all]

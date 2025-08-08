@@ -4,8 +4,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, BinaryContent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,14 +16,14 @@ base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
 # Create an instance of OpenAIModel using the loaded variables
-vision_model = OpenAIModel(
+vision_model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
 
-analysis_model = OpenAIModel(
+analysis_model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
 
 # Note for ollama both "minicpm-v" and "llama3.2-vision:latest" can't be used with pydantic tool calling, so we can't use it directly to call functions and format text
@@ -51,7 +51,7 @@ agent_vision = Agent(
 
 agent_analysis = Agent(
     model=analysis_model,
-    result_type=BillSummary,
+    output_type=BillSummary,
     output_retries=3,
     system_prompt = "You are smart analysis agent, take the extracted OCR data, extract items and convert it to structured report",
 )

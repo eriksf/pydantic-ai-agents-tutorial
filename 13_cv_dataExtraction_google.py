@@ -1,11 +1,12 @@
 import os
 
-import pymupdf4llm
+#import pymupdf4llm
 from dotenv import load_dotenv
+from markitdown import MarkItDown
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,13 +17,15 @@ base_url = os.getenv('BASE_URL')
 api_key = os.getenv('API_KEY')
 
 # Create an instance of OpenAIModel using the loaded variables
-model = OpenAIModel(
+model = GoogleModel(
     model_name,
-    provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    provider=GoogleProvider(api_key=api_key),
 )
 
 def extract_pdf_to_markdown(pdf_path):
-    markdown_content = pymupdf4llm.to_markdown(pdf_path)
+    md = MarkItDown(enable_plugins=True)
+    #markdown_content = pymupdf4llm.to_markdown(pdf_path)
+    markdown_content = md.convert(pdf_path)
     print(markdown_content)
     return markdown_content
 
